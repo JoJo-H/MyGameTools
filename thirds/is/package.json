@@ -1,0 +1,4 @@
+{
+	"name": "is",
+    "typings": "src/is.d.ts"
+}

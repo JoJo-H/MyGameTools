@@ -1,0 +1,16 @@
+{
+	"name": "egret",
+	"version": "4.1.0",
+	"modules": [
+		{
+			"name": "is",
+			"description": "is",
+			"files": [
+				"is.min.js",
+				"is.js",
+				"is.d.ts"
+			],
+			"root": "src"
+		}
+	]
+}

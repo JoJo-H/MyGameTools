@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outFile": "bin/big/big.js",
+    "allowJs": true
+  },
+  "files": [
+    "src/big.js"
+  ]
+}

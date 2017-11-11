@@ -1,0 +1,8 @@
+{
+  "name": "qrcode",
+  "version": "3.0.3",
+  "dep": [
+
+  ],
+  "typings": "src/qrcode.d.ts"
+}

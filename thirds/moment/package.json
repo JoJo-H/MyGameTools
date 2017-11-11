@@ -1,0 +1,4 @@
+{
+	"name": "moment",
+	"typings":"src/moment.d.ts"
+}

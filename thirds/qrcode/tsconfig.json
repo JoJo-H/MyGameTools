@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outFile": "bin/qrcode/qrcode.js",
+    "allowJs": true
+  },
+  "files": [
+    "src/qrcode.js"
+  ]
+}

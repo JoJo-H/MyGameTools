@@ -1,0 +1,4 @@
+{
+	"name": "numeral",
+	"typings":"src/numeral.d.ts"
+}

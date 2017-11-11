@@ -1,0 +1,8 @@
+{
+  "name": "big",
+  "version": "3.0.3",
+  "dep": [
+
+  ],
+  "typings": "src/big.d.ts"
+}

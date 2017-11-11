@@ -1,0 +1,4 @@
+{
+	"name": "promise",
+	"typings":"src/lib.es2015.promise.d.ts"
+}
