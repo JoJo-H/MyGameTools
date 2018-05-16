@@ -1,0 +1,70 @@
+1、白鹭引擎4.1后，新的方式构建第三方库
+
+如何用新的方式构建第三方库
+
+打开一个第三方库文件夹
+删除 package.json中的 modoules 字段
+在项目中与 package.json同级创建一个 tsconfig.json 文件
+修改 tsconfig.json文件，根据 TypeScript / JavaScript 不同类型的类库，进行不同的项目配置：
+// JavaScript 类库
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outFile": "bin/libtest1/libtest.js",
+        "allowJs": true
+    },
+    "files": [
+        "src/a.js”,     //  引入的d.ts文件地址
+        "src/b.js"
+    ]
+}
+// TypeScript 类库
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outFile": "bin/libtest1/libtest.js",
+        "declaration": true
+    },
+    "files": [
+        "src/a.ts",
+        "src/b.ts"
+    ]
+}
+如果项目是 JavaScript 类库，还需要在 package.json中配置一个 typings字段，并设置为一个自定义的 .d.ts 文件，如下所示
+/** 项目结构
+libtest
+    |-- src
+    |-- bin
+    |-- typings
+            |-- libtest.d.ts
+    |-- tsconfig.json
+    |-- package.json 
+*/
+​
+// package.json
+{
+    "name": "libtest",
+    "typings": "typings/libtest.d.ts”     //  引入的d.ts文件地址
+}
+完成上述操作后，执行 egret build，就会根据 tsconfig.json中的 outFile字段生成库文件，压缩文件以及 .d.ts 文件
+
+
+例子步骤：
+1、egret create_lib is  创建第三方库，空库
+2、添加js与d.ts文件到任意目录，这里添加到src目录下； —  把 is.js与is.d.ts添加到src目录下
+3、配置文件
+tsconfig.json 如下显示
+package.json  --
+如果项目是 JavaScript 类库，还需要在 package.json中配置一个 typings字段，并设置为一个自定义的 .d.ts 文件，如下所示
+
+
+
+
+4、执行egret build is 后，就会根据 tsconfig.json中的 outFile字段生成库文件，压缩文件以及 .d.ts 文件
+
+
+
+
+
+
+
