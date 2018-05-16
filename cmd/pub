@@ -1,0 +1,221 @@
+#!/bin/bash
+
+packageType=${1:-none}
+
+workPath=$WORKSPACE_PATH
+curDate=$(date +%Y-%m-%d)
+
+tapPath=$workPath/nanako/nanako
+publishPath=$workPath/nanako-publish
+egretPath=$workPath/nanako/gameCore/bin/egret-core
+
+releasePath=$workPath/nanako/release/android
+
+logPath=/tmp/publog.txt
+
+cd $egretPath
+sudo npm install -g
+
+cd $tapPath
+egret b -e
+egret publish -compile --runtime native
+
+fileName=$(ls -t $releasePath | awk '{if (NR==1) {print $0}}')
+
+buildPath=$releasePath/$fileName
+
+cd $publishPath
+
+git checkout master
+
+git rm -r *
+
+rsync -av $buildPath/ ./
+
+git add -f *
+
+git commit -m "提交更新版本"
+
+git push
+
+function publishAndroid() {
+    local androidPath=$workPath/nanako/NanakoAndroid/proj.android
+    cd $androidPath
+    rm -rf bin
+    echo "target=android-20" > $androidPath/project.properties
+    ant
+    git checkout -- $androidPath/project.properties
+    mkdir -p ~/Desktop/nanako-game/
+    cp $androidPath/bin/nanakoAndroid-debug.apk ~/Desktop/nanako-game/Nanako-${curDate}.apk
+}
+
+if [[ $packageType == "android" ]]; then
+    publishAndroid
+fi
+
+##!/bin/bash
+#
+#branch=$1
+#commit=$2
+#platform=$3
+#workPath=$WORKSPACE_PATH
+#curDate=$(date +%Y-%m-%d)
+#
+#if [[ $branch == "" ]]; then
+#    echo "请输入要发布的分支"
+#    exit 1
+#fi
+#
+#if [[ $workPath == "" ]]; then
+#    echo "请配置环境变量 WORKSPACE_PATH"
+#    exit 1
+#fi
+#
+#if [[ $workPath == "" ]]; then
+#    commit="no"
+#fi
+#
+#if [[ $platform == "" ]]; then
+#    platform="android"
+#fi
+#
+#nanakoPath=$workPath/nanako/nanako
+#publishPath=$workPath/nanako-publish
+#egretPath=$workPath/nanako/gameCore/bin/egret-core
+#
+#function checkResource() {
+#    local resourcePath=$nanakoPath/resource/resource.json;
+#    local mergePath=$nanakoPath/merge_resource.json;
+#    local tempPath=/tmp/$(uuidgen);
+#    cat $resourcePath | tr -d '\t\n\r' >> $tempPath;
+#    cat $mergePath | tr -d '\t\n\r' >> $tempPath;
+#
+#    cd $nanakoPath/resource;
+#
+#    tempPath2=/tmp/$(uuidgen);
+#    tempPath3=/tmp/$(uuidgen);
+#
+#    find . | grep -Ev "\/fonts|GlyphProject|preload\.json|resource\.json|ui|\.DS_Store|togather\.jsonsheet|animation/(.*?)png" | sed 's/\.\///g' | grep "\." > $tempPath2;
+#
+#    local rets=$(awk -v FileName="$tempPath" -v Prefix="$nanakoPath/resource" '
+#        BEGIN {
+#            content = "";
+#            while (getline < FileName) {
+#                content = content""$1;
+#            }
+#        }
+#        {
+#            pos = index(content, $0);
+#            if (pos == 0) {
+#                print Prefix"/"$0;
+#            }
+#        }
+#    ' $tempPath2);
+#
+#    if [[ $rets != "" ]]; then
+#        for ret in ${rets[*]}; do
+#            echo $ret;
+#        done
+#        exit 0
+#    fi
+#}
+#
+#rm -rf $nanakoPath/release
+#
+#checkResource
+#
+#cd $egretPath
+#sudo npm install -g
+#
+#cd $publishPath
+#git checkout $branch
+#
+#cd $nanakoPath
+#oldBranch=$(git branch | grep \* | awk '{print $2}')
+#
+#cd $publishPath
+#
+#git st | grep 'deleted:' | awk '{print $2}' | xargs -I {} git rm {}
+#
+#git pull
+#
+#cd $nanakoPath
+#git checkout $branch
+#egret b -e -log --runtime native
+#
+#cd $publishPath
+#rm -rf src
+#rm -rf resource/assets/config
+#rm -rf resource/assets/ui
+#
+#jmcpath=resource/config/jmcs
+#tempPath=/tmp/$(uuidgen)
+#mkdir $tempPath
+#mkdir $jmcpath
+#cp $jmcpath/UpdateConfirmLayer.jmc $tempPath/
+#cp $jmcpath/UpdateLayer.jmc $tempPath/
+#
+#rm -rf resource/config/jmcs
+#
+#rsync -av $tempPath/ $jmcpath/
+#
+#egret generate_version ./
+#
+#git add ./
+#git commit -m "提交最新版内容"
+#git push
+#
+#
+#function publishAndroid() {
+#    local androidPath=$workPath/nanako/NanakoAndroid/proj.android
+#    rm -rf $androidPath/assets/egret-game
+#    rsync -av --exclude=".git" ./ $androidPath/assets/egret-game/
+#    cd $androidPath/assets/egret-game/
+#    rm base.manifest
+#    rm version.manifest
+#
+#    egret generate_version ./
+#
+#    cd $androidPath
+#    rm -rf bin
+#    echo "target=android-20" > $androidPath/project.properties
+#    ant
+#    git checkout -- $androidPath/project.properties
+#    mkdir -p ~/Desktop/android/
+#    cp $androidPath/bin/nanakoAndroid-debug.apk ~/Desktop/android/Nanako-${curDate}.apk
+#}
+#
+#function publishIOS() {
+#    local iosPath=$workPath/nanako/NanakoIOS/
+#    local iosResPath=$iosPath/Resources
+#    mkdir -p $iosResPath
+#    rm -rf $iosResPath/egret-game/
+#    rsync -av --exclude=".git" ./ $iosResPath/egret-game/
+#
+#    cd $iosResPath/egret-game
+#
+#    rm base.manifest
+#    rm version.manifest
+#
+#    egret generate_version ./
+#
+#    cd $iosPath/proj.ios
+#    xcodebuild -target NanakoIOS clean
+#    xcodebuild -target NanakoIOS
+#    xcrun -sdk iphoneos PackageApplication -v $iosPath/proj.ios/build/Release-iphoneos/女神冲我来.app -o ~/Desktop/android/Nanako-${curDate}.ipa
+#}
+#
+#if [[ $commit == "yes" ]]; then
+#    if [[ $platform == "android" ]]; then
+#        publishAndroid
+#    elif [[ $platform == "all" ]]; then
+#        publishAndroid &
+#        publishIOS &
+#        wait
+#    else
+#        publishIOS
+#    fi
+#fi
+#
+#cd $nanakoPath
+#git checkout $oldBranch

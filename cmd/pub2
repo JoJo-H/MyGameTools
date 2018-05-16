@@ -1,0 +1,127 @@
+#!/bin/bash
+
+workPath=$WORKSPACE_PATH
+curDate=$(date +%Y-%m-%d)
+
+tapPath=$workPath/tapgame/TapGame
+publishPath=$workPath/tapgame-publish
+egretPath=$workPath/nanako/gameCore/bin/egret-core
+
+releasePath=$tapPath/release/android
+
+logPath=/tmp/pub2log.txt
+
+cd $egretPath
+sudo npm install -g
+
+cd $tapPath
+egret b -e
+egret publish -compile --runtime native
+
+fileName=$(ls -t $releasePath | awk '{if (NR==1) {print $0}}')
+
+buildPath=$releasePath/$fileName
+
+cd $publishPath
+
+git checkout master
+
+git rm -r *
+
+rsync -av $buildPath/ ./
+
+git add -f *
+
+git commit -m "提交更新版本"
+
+git push
+
+function publishAndroid() {
+    local androidPath=$workPath/tapgame/TapGameAndroid/proj.android
+    cd $androidPath
+    rm -rf bin
+    echo "target=android-20" > $androidPath/project.properties
+    ant
+    git checkout -- $androidPath/project.properties
+    mkdir -p ~/Desktop/tap-game/
+    cp $androidPath/bin/nanakoAndroid-debug.apk ~/Desktop/tap-game/TapGame-${curDate}.apk
+}
+
+publishAndroid
+
+#platform=$1
+#workPath=$WORKSPACE_PATH
+#curDate=$(date +%Y-%m-%d)
+#
+#if [[ $workPath == "" ]]; then
+#    echo "请配置环境变量 WORKSPACE_PATH"
+#    exit 1
+#fi
+#
+#if [[ $platform == "" ]]; then
+#    platform="android"
+#fi
+#
+#tapPath=$workPath/tapgame/TapGame
+#publishPath=$workPath/tapgame-publish
+#egretPath=$workPath/nanako/gameCore/bin/egret-core
+#
+#rm -rf $tapPath/release
+#
+#cd $egretPath
+#sudo npm install -g
+#
+#cd $publishPath
+#
+#cd $tapPath
+#
+#egret publish -log -compile --runtime native
+#
+#function publishAndroid() {
+#    local androidPath=$workPath/tapgame/TapGameAndroid/proj.android
+#    rm -rf $androidPath/assets/egret-game
+#    rsync -av --exclude=".git" ./ $androidPath/assets/egret-game/
+#    cd $androidPath/assets/egret-game/
+#    rm base.manifest
+#    rm version.manifest
+#
+#    egret generate_version ./
+#
+#    cd $androidPath
+#    rm -rf bin
+#    echo "target=android-20" > $androidPath/project.properties
+#    ant
+#    git checkout -- $androidPath/project.properties
+#    mkdir -p ~/Desktop/android/
+#    cp $androidPath/bin/nanakoAndroid-debug.apk ~/Desktop/android/Nanako-${curDate}.apk
+#}
+#
+#function publishIOS() {
+#    local iosPath=$workPath/tapgame/NanakoIOS/
+#    local iosResPath=$iosPath/Resources
+#    mkdir -p $iosResPath
+#    rm -rf $iosResPath/egret-game/
+#    rsync -av --exclude=".git" ./ $iosResPath/egret-game/
+#
+#    cd $iosResPath/egret-game
+#
+#    rm base.manifest
+#    rm version.manifest
+#
+#    egret generate_version ./
+#
+#    cd $iosPath/proj.ios
+#    xcodebuild -target NanakoIOS clean
+#    xcodebuild -target NanakoIOS
+#    xcrun -sdk iphoneos PackageApplication -v $iosPath/proj.ios/build/Release-iphoneos/女神冲我来.app -o ~/Desktop/android/Nanako-${curDate}.ipa
+#}
+#
+#if [[ $platform == "android" ]]; then
+#    publishAndroid
+#elif [[ $platform == "all" ]]; then
+#    publishAndroid &
+#    publishIOS &
+#    wait
+#else
+#    publishIOS
+#fi

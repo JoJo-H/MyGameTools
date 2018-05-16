@@ -43,25 +43,24 @@ if [ "$?" == "100" ]; then
 	exit 100
 fi
 
-resetResStatus
-
-egret build -e
-egret publish --version $versionName
-
-ruby publish.rb -p .
-
 releasePath=bin-release/web/$versionName
 indexPath=$releasePath/index.html
 releaseResourcePath=$releasePath/resource
 
-#复制文件内容
-copyResJson
+function cpResJson(){
+	touch resource/resource.json
+	cp resource/default.res.json resource/resource.json
+}
+cpResJson
+resetResStatus
+
+egret build -e
+egret publish --version $versionName
+ruby publish.rb -p .
+cpResJson
 
 res publish . $releasePath
 euibooster . $releasePath
-
-#复制文件内容
-copyResJson
 
 libs=$(sed -n 's/.*\"lib\"\ *src=\"\([^\"]*\)\".*/\1/p' $indexPath)
 
@@ -84,7 +83,7 @@ function moveTo() {
 }
 
 function moveConf(){
-	local confPath=$(ls $releaseResourcePath/resource.json)
+	local confPath=resource/resource.json
 	local c32=$(cal_crc32 $confPath)
 
 	local distPath=$releaseResourcePath/resource_$c32.json
@@ -112,6 +111,7 @@ rm -rf $releasePath/polyfill
 rm -rf $releasePath/libs
 rm -rf $releasePath/backup
 rm -rf $releasePath/js
+rm -rf resource/resource.json
 
 echo "local debug url:bin-release/web/${versionName}/?codeVer=${mainCrc}.${libCrc}&resVer=${confCrc}.${themeCrc}"
 

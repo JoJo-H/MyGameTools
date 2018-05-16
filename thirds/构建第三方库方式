@@ -40,7 +40,6 @@ libtest
     |-- tsconfig.json
     |-- package.json 
 */
-​
 // package.json
 {
     "name": "libtest",
@@ -56,6 +55,22 @@ libtest
 tsconfig.json 如下显示
 package.json  --
 如果项目是 JavaScript 类库，还需要在 package.json中配置一个 typings字段，并设置为一个自定义的 .d.ts 文件，如下所示
+// TypeScript 类库
+{
+    "compilerOptions": {
+        "target": "es5",
+        "outFile": "bin/is/is.js",
+        "declaration": true
+    },
+    "files": [
+        "src/is.js"
+    ]
+}
+// package.json
+{
+    "name": "is",
+    "typings": "src/is.d.ts” // 引入的d.ts文件地址
+}
 
 
 

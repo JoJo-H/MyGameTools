@@ -1,0 +1,4 @@
+{
+	"name": "tiled",
+	"typings": "src/tiled.d.ts”
+}
