@@ -1,0 +1,8 @@
+{
+  "name": "base64",
+  "version": "5.1.2",
+  "dep": [
+
+  ],
+  "typings": "src/base64.d.ts"
+}

@@ -1,0 +1,5 @@
+{
+	"name": "egret",
+	"version": "5.2.2",
+	"typings": "src/PathFinding.d.ts"
+}

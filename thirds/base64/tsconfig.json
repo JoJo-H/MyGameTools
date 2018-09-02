@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outFile": "bin/base64/base64.js",
+    "allowJs": true
+  },
+  "files": [
+    "src/base64.js"
+  ]
+}

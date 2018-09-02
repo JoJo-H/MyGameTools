@@ -1,0 +1,10 @@
+{"compilerOptions": {
+        "target": "es5",
+        "outFile": "bin/PathFinding/PathFinding.js",
+        "declaration": true,
+        "allowJs": true
+    },
+    "files": [
+        "src/PathFinding.js"
+    ]
+}
